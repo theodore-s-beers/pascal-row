@@ -1,31 +1,33 @@
 #![warn(clippy::pedantic, clippy::nursery)]
+#![allow(clippy::manual_is_multiple_of)]
 
 fn main() {
-    let row = get_triangle_row(12);
+    let row = nth_pascal_row(32);
     println!("{row:?}");
 }
 
-fn get_triangle_row(n: usize) -> Vec<u64> {
-    let length = n + 1;
-
-    let mut row_a = vec![1; length];
+fn nth_pascal_row(n: usize) -> Vec<u64> {
+    let mut row_a = vec![1; n + 1];
     let mut row_b = row_a.clone();
 
-    let mut right = 2;
+    let mut curr: usize;
+    let mut frontier = 2;
 
-    while right < length {
-        for i in 1..right {
-            match right % 2 {
-                0 => row_a[i] = row_b[i - 1] + row_b[i],
-                _ => row_b[i] = row_a[i - 1] + row_a[i],
+    while frontier <= n {
+        curr = 1;
+
+        while curr < frontier {
+            if frontier % 2 == 0 {
+                row_a[curr] = row_b[curr - 1] + row_b[curr];
+            } else {
+                row_b[curr] = row_a[curr - 1] + row_a[curr];
             }
+
+            curr += 1;
         }
 
-        right += 1;
+        frontier += 1;
     }
 
-    match n % 2 {
-        0 => row_a,
-        _ => row_b,
-    }
+    if n % 2 == 0 { row_a } else { row_b }
 }
