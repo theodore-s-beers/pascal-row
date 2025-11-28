@@ -23,6 +23,27 @@ pub fn nth_pascal_row(n: usize, row: &mut [u64]) -> Result<(), &'static str> {
     Ok(())
 }
 
+// Unsafe version to be run in Godbolt, to get assembly similar to Zig
+// Use flags: -C opt-level=3 -C target-feature=+avx2
+pub fn nth_pascal_row_unsafe(n: usize, row: &mut [u64]) {
+    unsafe {
+        *row.get_unchecked_mut(0) = 1;
+
+        let mut i = 1;
+        while i <= n {
+            let mut j = i;
+            while j >= 1 {
+                let val = *row.get_unchecked(j - 1);
+                *row.get_unchecked_mut(j) += val;
+                j -= 1;
+            }
+
+            *row.get_unchecked_mut(i) = 1;
+            i += 1;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::nth_pascal_row;
